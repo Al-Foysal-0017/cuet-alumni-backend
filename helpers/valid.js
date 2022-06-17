@@ -1,4 +1,5 @@
 const { check } = require("express-validator");
+
 exports.validSign = [
   check("first_name", "First Name is required").notEmpty(),
   check("last_name", "Last Name is required").notEmpty(),

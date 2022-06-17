@@ -3,9 +3,13 @@ const morgan = require("morgan");
 const connectDB = require("./config/db");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+
 // Config dotev
+// require("dotenv").config({
+//   path: "./config/config.env",
+// });
 require("dotenv").config({
-  path: "./config/config.env",
+  path: ".env",
 });
 
 const app = express();

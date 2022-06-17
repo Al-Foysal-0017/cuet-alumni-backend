@@ -26,12 +26,12 @@ exports.registerController = (req, res) => {
     blood,
     avatar,
   } = req.body;
-  const errors = validationResult(req);
+  const error = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    const firstError = errors.array().map((error) => error.msg)[0];
+  if (!error.isEmpty()) {
+    const firstError = error.array().map((error) => error.msg)[0];
     return res.status(422).json({
-      errors: firstError,
+      error: firstError,
     });
   } else {
     User.findOne({
@@ -39,7 +39,7 @@ exports.registerController = (req, res) => {
     }).exec((err, user) => {
       if (user) {
         return res.status(400).json({
-          errors: "Email is taken",
+          error: "Email is taken",
         });
       }
     });
@@ -87,7 +87,7 @@ exports.registerController = (req, res) => {
       .catch((err) => {
         return res.status(400).json({
           success: false,
-          errors: errorHandler(err),
+          error: errorHandler(err),
         });
       });
   }
@@ -101,7 +101,7 @@ exports.activationController = (req, res) => {
       if (err) {
         console.log("Activation error");
         return res.status(401).json({
-          errors: "Expired link. Signup again",
+          error: "Expired link. Signup again",
         });
       } else {
         const {
@@ -137,7 +137,7 @@ exports.activationController = (req, res) => {
           if (err) {
             console.log("Save error", errorHandler(err));
             return res.status(401).json({
-              errors: errorHandler(err),
+              error: errorHandler(err),
             });
           } else {
             return res.json({
@@ -159,11 +159,11 @@ exports.activationController = (req, res) => {
 
 exports.signinController = (req, res) => {
   const { email, password } = req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const firstError = errors.array().map((error) => error.msg)[0];
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    const firstError = error.array().map((error) => error.msg)[0];
     return res.status(422).json({
-      errors: firstError,
+      error: firstError,
     });
   } else {
     // check if user exist
@@ -186,13 +186,13 @@ exports.signinController = (req, res) => {
       } = user;
       if (err || !user) {
         return res.status(400).json({
-          errors: "User with that email does not exist. Please signup",
+          error: "User with that email does not exist. Please signup",
         });
       }
       // authenticate
       if (!user.authenticate(password)) {
         return res.status(400).json({
-          errors: "Email and password do not match",
+          error: "Email and password do not match",
         });
       }
       // generate a token and send to client
@@ -252,12 +252,12 @@ exports.adminMiddleware = (req, res, next) => {
 
 exports.forgotPasswordController = (req, res) => {
   const { email } = req.body;
-  const errors = validationResult(req);
+  const error = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    const firstError = errors.array().map((error) => error.msg)[0];
+  if (!error.isEmpty()) {
+    const firstError = error.array().map((error) => error.msg)[0];
     return res.status(422).json({
-      errors: firstError,
+      error: firstError,
     });
   } else {
     User.findOne(
@@ -331,12 +331,12 @@ exports.forgotPasswordController = (req, res) => {
 exports.resetPasswordController = (req, res) => {
   const { resetPasswordLink, newPassword } = req.body;
 
-  const errors = validationResult(req);
+  const error = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    const firstError = errors.array().map((error) => error.msg)[0];
+  if (!error.isEmpty()) {
+    const firstError = error.array().map((error) => error.msg)[0];
     return res.status(422).json({
-      errors: firstError,
+      error: firstError,
     });
   } else {
     if (resetPasswordLink) {
