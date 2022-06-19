@@ -23,6 +23,7 @@ app.use(bodyParser.json());
 // Load routes
 const authRouter = require("./routes/auth.route");
 const userRouter = require("./routes/user.route");
+const eventRouter = require("./routes/events.route");
 
 // Dev Logginf Middleware
 app.use(morgan("dev"));
@@ -30,6 +31,7 @@ app.use(morgan("dev"));
 // Use Routes
 app.use("/api", authRouter);
 app.use("/api", userRouter);
+app.use("/api", eventRouter);
 
 app.use((req, res) => {
   res.status(404).json({
