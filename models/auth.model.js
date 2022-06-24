@@ -13,6 +13,11 @@ const userScheama = new mongoose.Schema(
       trim: true,
       required: true,
     },
+    student_id: {
+      type: Number,
+      trim: true,
+      required: true,
+    },
     email: {
       type: String,
       trim: true,

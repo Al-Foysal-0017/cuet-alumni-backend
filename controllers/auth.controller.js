@@ -3,6 +3,7 @@ const expressJwt = require("express-jwt");
 const _ = require("lodash");
 const { OAuth2Client } = require("google-auth-library");
 const fetch = require("node-fetch");
+// const sendEmail = require("../utils/sendEmail");
 
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
@@ -10,9 +11,10 @@ const expressJWT = require("express-jwt");
 const { errorHandler } = require("../helpers/dbErrorHandling");
 const sgMail = require("@sendgrid/mail");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+// const ErrorHander = require("../utils/errorhander");
 sgMail.setApiKey(process.env.MAIL_KEY);
 
-exports.registerController = (req, res) => {
+exports.registerController = async (req, res) => {
   const {
     first_name,
     last_name,
@@ -66,32 +68,63 @@ exports.registerController = (req, res) => {
       }
     );
 
-    const emailData = {
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: "Account activation link",
-      html: `
-                <h1>Please use the following to activate your account</h1>
-                <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
-                <hr />
-                <p>This email may containe sensetive information</p>
-                <p>${process.env.CLIENT_URL}</p>
-            `,
-    };
+    // const emailData = {
+    //   from: process.env.EMAIL_FROM,
+    //   to: email,
+    //   subject: "Account activation link",
+    //   html: `
+    //             <h1>Please use the following to activate your account</h1>
+    //             <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+    //             <hr />
+    //             <p>This email may containe sensetive information</p>
+    //             <p>${process.env.CLIENT_URL}</p>
+    //         `,
+    // };
 
-    sgMail
-      .send(emailData)
-      .then((sent) => {
-        return res.json({
-          message: `Email has been sent to ${email}`,
-        });
-      })
-      .catch((err) => {
-        return res.status(400).json({
-          success: false,
+    // sgMail
+    //   .send(emailData)
+    //   .then((sent) => {
+    //     return res.json({
+    //       message: `Email has been sent to ${email}`,
+    //     });
+    //   })
+    //   .catch((err) => {
+    //     return res.status(400).json({
+    //       success: false,
+    //       error: errorHandler(err),
+    //     });
+    //   });
+
+    const user = new User({
+      first_name,
+      last_name,
+      student_id,
+      email,
+      password,
+      department,
+      batch,
+      graduation_year,
+      mobile,
+      country,
+      blood,
+      avatar,
+    });
+
+    user.save((err, user) => {
+      if (err) {
+        console.log("Save error", errorHandler(err));
+        return res.status(401).json({
           error: errorHandler(err),
         });
-      });
+      } else {
+        return res.json({
+          success: true,
+          // message: user,
+          token,
+          message: "Signup success",
+        });
+      }
+    });
   }
 };
 
