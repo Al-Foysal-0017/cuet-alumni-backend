@@ -16,6 +16,7 @@ exports.registerController = (req, res) => {
   const {
     first_name,
     last_name,
+    student_id,
     email,
     password,
     department,
@@ -48,6 +49,7 @@ exports.registerController = (req, res) => {
       {
         first_name,
         last_name,
+        student_id,
         email,
         password,
         department,
@@ -107,6 +109,7 @@ exports.activationController = (req, res) => {
         const {
           first_name,
           last_name,
+          student_id,
           email,
           password,
           department,
@@ -122,6 +125,7 @@ exports.activationController = (req, res) => {
         const user = new User({
           first_name,
           last_name,
+          student_id,
           email,
           password,
           department,
@@ -174,6 +178,7 @@ exports.signinController = (req, res) => {
         _id,
         first_name,
         last_name,
+        student_id,
         email,
         department,
         batch,
@@ -201,6 +206,7 @@ exports.signinController = (req, res) => {
           _id,
           first_name,
           last_name,
+          student_id,
           email,
           department,
           batch,
