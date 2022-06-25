@@ -47,13 +47,15 @@
 // });
 
 const express = require("express");
+// const home = require("./routes/home.js");
+
 const app = express();
-var cors = require("cors");
-app.use(cors());
+
+// app.use("/home", home);
 app.get("/", function (req, res) {
-  res.json({ msg: "Naiem Al Foysal" });
+  res.send("Hello World");
 });
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Your app running successfully on port:${PORT}`);
-});
+
+// const port = process.env.PORT || 9000;
+
+app.listen(9000, () => console.log(`Successfully run on port 9000`));
