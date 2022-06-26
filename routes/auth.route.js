@@ -12,6 +12,7 @@ const {
   facebookController,
   getAllUser,
   updateUserRole,
+  registerController2,
 } = require("../controllers/auth.controller");
 
 const {
@@ -27,6 +28,7 @@ const {
 } = require("../helpers/valid");
 
 router.post("/register", validSign, registerController);
+router.post("/register2", registerController2);
 
 router.get("/test", (req, res) => {
   res.json({ msg: "Naiem Mohammad Al Foysal" });

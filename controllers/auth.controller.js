@@ -128,6 +128,54 @@ exports.registerController = async (req, res) => {
   }
 };
 
+exports.registerController2 = async (req, res) => {
+  const { first_name, last_name, email } = req.body;
+
+  User.findOne({
+    email,
+  }).exec((err, user) => {
+    if (user) {
+      return res.status(400).json({
+        error: "Email is taken",
+      });
+    }
+  });
+
+  const token = jwt.sign(
+    {
+      first_name,
+      last_name,
+      email,
+    },
+    process.env.JWT_ACCOUNT_ACTIVATION,
+    {
+      expiresIn: "15m",
+    }
+  );
+
+  const user = new User({
+    first_name,
+    last_name,
+    email,
+  });
+
+  user.save((err, user) => {
+    if (err) {
+      console.log("Save error", errorHandler(err));
+      return res.status(401).json({
+        error: errorHandler(err),
+      });
+    } else {
+      return res.json({
+        success: true,
+        // message: user,
+        token,
+        message: "Signup success",
+      });
+    }
+  });
+};
+
 exports.activationController = (req, res) => {
   const { token } = req.body;
 

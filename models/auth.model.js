@@ -13,11 +13,6 @@ const userScheama = new mongoose.Schema(
       trim: true,
       required: true,
     },
-    student_id: {
-      type: Number,
-      trim: true,
-      required: true,
-    },
     email: {
       type: String,
       trim: true,
@@ -25,54 +20,76 @@ const userScheama = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
-    department: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    batch: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    graduation_year: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    mobile: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    country: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    blood: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    avatar: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    hashed_password: {
-      type: String,
-      required: true,
-    },
-    salt: String,
-    role: {
-      type: String,
-      default: "subscriber",
-    },
-    resetPasswordLink: {
-      data: String,
-      default: "",
-    },
+    // first_name: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // last_name: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // student_id: {
+    //   type: Number,
+    //   trim: true,
+    //   required: true,
+    // },
+    // email: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    //   unique: true,
+    //   lowercase: true,
+    // },
+    // department: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // batch: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // graduation_year: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // mobile: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // country: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // blood: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // avatar: {
+    //   type: String,
+    //   trim: true,
+    //   required: true,
+    // },
+    // hashed_password: {
+    //   type: String,
+    //   required: true,
+    // },
+    // salt: String,
+    // role: {
+    //   type: String,
+    //   default: "subscriber",
+    // },
+    // resetPasswordLink: {
+    //   data: String,
+    //   default: "",
+    // },
   },
   {
     timestamps: true,
