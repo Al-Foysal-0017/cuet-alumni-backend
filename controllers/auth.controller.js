@@ -604,3 +604,15 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
+
+// Get User Role
+exports.getUserRole = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  const { role } = user;
+
+  res.status(200).json({
+    success: true,
+    role,
+  });
+});

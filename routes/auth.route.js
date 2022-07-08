@@ -13,6 +13,7 @@ const {
   getAllUser,
   updateUserRole,
   registerController2,
+  getUserRole,
 } = require("../controllers/auth.controller");
 
 const {
@@ -58,6 +59,7 @@ router.get("/admin/users/request", requireSignin, adminMiddleware, getAllUser);
 //   .get(isAuthenticatedUser, authorizeRoles("admin"), getSingleUser)
 // .put(isAuthenticatedUser, authorizeRoles("admin"), updateUserRole)
 //   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteUser);
+router.get("/role/user/:id", requireSignin, getUserRole);
 router.put("/admin/user/:id", requireSignin, adminMiddleware, updateUserRole);
 
 module.exports = router;
