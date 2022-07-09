@@ -47,27 +47,6 @@ exports.registerController = async (req, res) => {
       }
     });
 
-    const token = jwt.sign(
-      {
-        first_name,
-        last_name,
-        student_id,
-        email,
-        password,
-        department,
-        batch,
-        graduation_year,
-        mobile,
-        country,
-        blood,
-        avatar,
-      },
-      process.env.JWT_ACCOUNT_ACTIVATION,
-      {
-        expiresIn: "15m",
-      }
-    );
-
     // const emailData = {
     //   from: process.env.EMAIL_FROM,
     //   to: email,
@@ -110,6 +89,30 @@ exports.registerController = async (req, res) => {
       avatar,
     });
 
+    const { _id } = user;
+
+    const token = jwt.sign(
+      {
+        _id,
+        first_name,
+        last_name,
+        student_id,
+        email,
+        password,
+        department,
+        batch,
+        graduation_year,
+        mobile,
+        country,
+        blood,
+        avatar,
+      },
+      process.env.JWT_ACCOUNT_ACTIVATION,
+      {
+        expiresIn: "15m",
+      }
+    );
+
     user.save((err, user) => {
       if (err) {
         console.log("Save error", errorHandler(err));
@@ -120,6 +123,7 @@ exports.registerController = async (req, res) => {
         return res.json({
           success: true,
           // message: user,
+          // _id,
           token,
           message: "Signup success",
         });
@@ -128,53 +132,53 @@ exports.registerController = async (req, res) => {
   }
 };
 
-exports.registerController2 = async (req, res) => {
-  const { first_name, last_name, email } = req.body;
+// exports.registerController2 = async (req, res) => {
+//   const { first_name, last_name, email } = req.body;
 
-  User.findOne({
-    email,
-  }).exec((err, user) => {
-    if (user) {
-      return res.status(400).json({
-        error: "Email is taken",
-      });
-    }
-  });
+//   User.findOne({
+//     email,
+//   }).exec((err, user) => {
+//     if (user) {
+//       return res.status(400).json({
+//         error: "Email is taken",
+//       });
+//     }
+//   });
 
-  const token = jwt.sign(
-    {
-      first_name,
-      last_name,
-      email,
-    },
-    process.env.JWT_ACCOUNT_ACTIVATION,
-    {
-      expiresIn: "15m",
-    }
-  );
+//   const token = jwt.sign(
+//     {
+//       first_name,
+//       last_name,
+//       email,
+//     },
+//     process.env.JWT_ACCOUNT_ACTIVATION,
+//     {
+//       expiresIn: "15m",
+//     }
+//   );
 
-  const user = new User({
-    first_name,
-    last_name,
-    email,
-  });
+//   const user = new User({
+//     first_name,
+//     last_name,
+//     email,
+//   });
 
-  user.save((err, user) => {
-    if (err) {
-      console.log("Save error", errorHandler(err));
-      return res.status(401).json({
-        error: errorHandler(err),
-      });
-    } else {
-      return res.json({
-        success: true,
-        // message: user,
-        token,
-        message: "Signup success",
-      });
-    }
-  });
-};
+//   user.save((err, user) => {
+//     if (err) {
+//       console.log("Save error", errorHandler(err));
+//       return res.status(401).json({
+//         error: errorHandler(err),
+//       });
+//     } else {
+//       return res.json({
+//         success: true,
+//         // message: user,
+//         token,
+//         message: "Signup success",
+//       });
+//     }
+//   });
+// };
 
 exports.activationController = (req, res) => {
   const { token } = req.body;
