@@ -1,18 +1,99 @@
 const User = require("../models/auth.model");
+const Otp = require("../models/otpModel");
+const bcrypt = require("bcrypt");
+const axios = require("axios");
 const expressJwt = require("express-jwt");
 const _ = require("lodash");
-const { OAuth2Client } = require("google-auth-library");
+const otpGenerator = require("otp-generator");
 const fetch = require("node-fetch");
-// const sendEmail = require("../utils/sendEmail");
 
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const expressJWT = require("express-jwt");
 const { errorHandler } = require("../helpers/dbErrorHandling");
-const sgMail = require("@sendgrid/mail");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 // const ErrorHander = require("../utils/errorhander");
-sgMail.setApiKey(process.env.MAIL_KEY);
+
+// OTP Request For SignUp
+module.exports.signUp = async (req, res) => {
+  const user = await User.findOne({
+    number: req.body.number,
+  });
+
+  if (user) {
+    return res.status(400).send("User already registered!");
+  }
+
+  const OTP = otpGenerator.generate(6, {
+    digits: true,
+    upperCaseAlphabets: false,
+    lowerCaseAlphabets: false,
+    specialChars: false,
+  });
+
+  const number = req.body.number;
+  const password = req.body.password;
+  console.log(OTP);
+
+  // sending sms
+  // const greenwebsms = new URLSearchParams();
+  // greenwebsms.append(
+  //   "token",
+  //   "8229165538165745053879f2e330f24bc412f612809d26591919"
+  // );
+  // greenwebsms.append("to", `+88${number}`);
+  // greenwebsms.append("message", `আপনার ওটিপি: ${OTP}`);
+  // axios
+  //   .post("http://api.greenweb.com.bd/api.php", greenwebsms)
+  //   .then((response) => {
+  //     console.log(response.data);
+  //   });
+
+  const otp = new Otp({ number: number, password, otp: OTP });
+  const salt = await bcrypt.genSalt(10);
+  otp.otp = await bcrypt.hash(otp.otp, salt);
+  const result = await otp.save();
+  return res.status(200).send("Otp send successfully.");
+};
+
+// Verify OTP
+module.exports.verifyOtp = async (req, res) => {
+  const otpHolder = await Otp.find({
+    number: req.body.number,
+  });
+  if (otpHolder.length === 0) {
+    return res.status(400).send("Your otp is expired. Please try again.");
+  }
+  const rightOtpFind = otpHolder[otpHolder.length - 1];
+  const validUser = await bcrypt.compare(req.body.otp, rightOtpFind.otp);
+
+  if (rightOtpFind.number === req.body.number && validUser) {
+    const user = new User(_.pick(req.body, ["number", "password"]));
+    const token = user.generateJWT();
+    const result = await user.save();
+
+    const OTPDelete = await Otp.deleteMany({
+      number: rightOtpFind.number,
+    });
+
+    // options for cookie
+    const options = {
+      expires: new Date(
+        Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+    };
+    // end cookie
+
+    return res.status(200).cookie("token", token, options).send({
+      message: "User Registration Successfully.",
+      token: token,
+      data: result,
+    });
+  } else {
+    return res.status(400).send("Your OTP was wrong.");
+  }
+};
 
 exports.registerController = async (req, res) => {
   const {
@@ -131,54 +212,6 @@ exports.registerController = async (req, res) => {
     });
   }
 };
-
-// exports.registerController2 = async (req, res) => {
-//   const { first_name, last_name, email } = req.body;
-
-//   User.findOne({
-//     email,
-//   }).exec((err, user) => {
-//     if (user) {
-//       return res.status(400).json({
-//         error: "Email is taken",
-//       });
-//     }
-//   });
-
-//   const token = jwt.sign(
-//     {
-//       first_name,
-//       last_name,
-//       email,
-//     },
-//     process.env.JWT_ACCOUNT_ACTIVATION,
-//     {
-//       expiresIn: "15m",
-//     }
-//   );
-
-//   const user = new User({
-//     first_name,
-//     last_name,
-//     email,
-//   });
-
-//   user.save((err, user) => {
-//     if (err) {
-//       console.log("Save error", errorHandler(err));
-//       return res.status(401).json({
-//         error: errorHandler(err),
-//       });
-//     } else {
-//       return res.json({
-//         success: true,
-//         // message: user,
-//         token,
-//         message: "Signup success",
-//       });
-//     }
-//   });
-// };
 
 exports.activationController = (req, res) => {
   const { token } = req.body;
@@ -477,56 +510,55 @@ exports.resetPasswordController = (req, res) => {
   }
 };
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT);
+// const client = new OAuth2Client(process.env.GOOGLE_CLIENT);
 // Google Login
 exports.googleController = (req, res) => {
-  const { idToken } = req.body;
-
-  client
-    .verifyIdToken({ idToken, audience: process.env.GOOGLE_CLIENT })
-    .then((response) => {
-      // console.log('GOOGLE LOGIN RESPONSE',response)
-      const { email_verified, name, email } = response.payload;
-      if (email_verified) {
-        User.findOne({ email }).exec((err, user) => {
-          if (user) {
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-              expiresIn: "7d",
-            });
-            const { _id, email, name, role } = user;
-            return res.json({
-              token,
-              user: { _id, email, name, role },
-            });
-          } else {
-            let password = email + process.env.JWT_SECRET;
-            user = new User({ name, email, password });
-            user.save((err, data) => {
-              if (err) {
-                console.log("ERROR GOOGLE LOGIN ON USER SAVE", err);
-                return res.status(400).json({
-                  error: "User signup failed with google",
-                });
-              }
-              const token = jwt.sign(
-                { _id: data._id },
-                process.env.JWT_SECRET,
-                { expiresIn: "7d" }
-              );
-              const { _id, email, name, role } = data;
-              return res.json({
-                token,
-                user: { _id, email, name, role },
-              });
-            });
-          }
-        });
-      } else {
-        return res.status(400).json({
-          error: "Google login failed. Try again",
-        });
-      }
-    });
+  // const { idToken } = req.body;
+  // client
+  //   .verifyIdToken({ idToken, audience: process.env.GOOGLE_CLIENT })
+  //   .then((response) => {
+  //     // console.log('GOOGLE LOGIN RESPONSE',response)
+  //     const { email_verified, name, email } = response.payload;
+  //     if (email_verified) {
+  //       User.findOne({ email }).exec((err, user) => {
+  //         if (user) {
+  //           const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+  //             expiresIn: "7d",
+  //           });
+  //           const { _id, email, name, role } = user;
+  //           return res.json({
+  //             token,
+  //             user: { _id, email, name, role },
+  //           });
+  //         } else {
+  //           let password = email + process.env.JWT_SECRET;
+  //           user = new User({ name, email, password });
+  //           user.save((err, data) => {
+  //             if (err) {
+  //               console.log("ERROR GOOGLE LOGIN ON USER SAVE", err);
+  //               return res.status(400).json({
+  //                 error: "User signup failed with google",
+  //               });
+  //             }
+  //             const token = jwt.sign(
+  //               { _id: data._id },
+  //               process.env.JWT_SECRET,
+  //               { expiresIn: "7d" }
+  //             );
+  //             const { _id, email, name, role } = data;
+  //             return res.json({
+  //               token,
+  //               user: { _id, email, name, role },
+  //             });
+  //           });
+  //         }
+  //       });
+  //     } else {
+  //       return res.status(400).json({
+  //         error: "Google login failed. Try again",
+  //       });
+  //     }
+  //   });
 };
 
 exports.facebookController = (req, res) => {

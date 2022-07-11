@@ -14,6 +14,8 @@ const {
   updateUserRole,
   registerController2,
   getUserRole,
+  signUp,
+  verifyOtp,
 } = require("../controllers/auth.controller");
 
 const {
@@ -28,6 +30,8 @@ const {
   resetPasswordValidator,
 } = require("../helpers/valid");
 
+router.route("/signup").post(signUp);
+router.route("/signup/verify").post(verifyOtp);
 router.post("/register", validSign, registerController);
 // router.post("/register2", registerController2);
 

@@ -2,12 +2,10 @@ const express = require("express");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 // Config dotev
-// require("dotenv").config({
-//   path: "./config/config.env",
-// });
 require("dotenv").config({
   path: ".env",
 });
@@ -18,7 +16,7 @@ app.use(cors());
 // Connect to database
 connectDB();
 
-// body parser
+app.use(cookieParser());
 app.use(bodyParser.json());
 // Load routes
 const authRouter = require("./routes/auth.route");
@@ -45,17 +43,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
-
-// const express = require("express");
-// // const home = require("./routes/home.js");
-
-// const app = express();
-
-// // app.use("/home", home);
-// app.get("/", function (req, res) {
-//   res.send("Hello World");
-// });
-
-// // const port = process.env.PORT || 9000;
-
-// app.listen(5000, () => console.log(`Successfully run on port 9000`));
