@@ -89,7 +89,7 @@ const userScheama = new mongoose.Schema(
     },
     email: {
       type: String,
-      default: "abcd@gmail.com",
+      default: "abcde@gmail.com",
     },
     firstName: {
       type: String,
