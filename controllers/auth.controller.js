@@ -53,7 +53,8 @@ module.exports.signUp = async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   otp.otp = await bcrypt.hash(otp.otp, salt);
   const result = await otp.save();
-  return res.status(200).send("Otp send successfully.");
+  // return res.status(200).send("Otp send successfully.");
+  return res.status(200).send(`THE OTP IS: ${OTP}`);
 };
 
 // Verify OTP
