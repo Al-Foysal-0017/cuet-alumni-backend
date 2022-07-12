@@ -58,6 +58,7 @@ module.exports.signUp = async (req, res) => {
 
 // Verify OTP
 module.exports.verifyOtp = async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
   const otpHolder = await Otp.find({
     number: req.body.number,
   });
