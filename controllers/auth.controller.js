@@ -38,21 +38,21 @@ exports.signUp = catchAsyncErrors(async (req, res, next) => {
   console.log(OTP);
 
   // sending sms
-  // const greenwebsms = new URLSearchParams();
-  // greenwebsms.append(
-  //   "token",
-  //   "8229165538165745053879f2e330f24bc412f612809d26591919"
-  // );
-  // greenwebsms.append("to", `+88${number}`);
-  // greenwebsms.append(
-  //   "message",
-  //   `চুয়েট অ্যালুমনাই এ নিবন্ধনের জন্য আপনার ওটিপি (OTP) কোড: ${OTP}`
-  // );
-  // axios
-  //   .post("http://api.greenweb.com.bd/api.php", greenwebsms)
-  //   .then((response) => {
-  //     console.log(response.data);
-  //   });
+  const greenwebsms = new URLSearchParams();
+  greenwebsms.append(
+    "token",
+    "8229165538165745053879f2e330f24bc412f612809d26591919"
+  );
+  greenwebsms.append("to", `+88${number}`);
+  greenwebsms.append(
+    "message",
+    `চুয়েট অ্যালুমনাই এ নিবন্ধনের জন্য আপনার ওটিপি (OTP) কোড: ${OTP}`
+  );
+  axios
+    .post("http://api.greenweb.com.bd/api.php", greenwebsms)
+    .then((response) => {
+      console.log(response.data);
+    });
 
   const otp = new Otp({ number: number, password, otp: OTP });
   const salt = await bcrypt.genSalt(10);
