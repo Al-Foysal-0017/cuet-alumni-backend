@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
+const errorMiddleware = require("./middleware/error");
+
 // Config dotev
 require("dotenv").config({
   path: ".env",
@@ -20,7 +22,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 // Load routes
 const authRouter = require("./routes/auth.route");
-const userRouter = require("./routes/user.route");
+// const userRouter = require("./routes/user.route");
 const eventRouter = require("./routes/events.route");
 
 // Dev Logginf Middleware
@@ -28,7 +30,7 @@ app.use(morgan("dev"));
 
 // Use Routes
 app.use("/api", authRouter);
-app.use("/api", userRouter);
+// app.use("/api", userRouter);
 app.use("/api", eventRouter);
 
 app.use((req, res) => {
@@ -37,6 +39,9 @@ app.use((req, res) => {
     msg: "Page not founded",
   });
 });
+
+// Middleware for Errors
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
 

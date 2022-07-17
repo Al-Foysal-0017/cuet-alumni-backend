@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
-// Load Controllers
 const {
   createEvent,
   updateEvent,
@@ -9,22 +9,22 @@ const {
   getAllevents,
 } = require("../controllers/events.controller");
 
-const {
-  requireSignin,
-  adminMiddleware,
-} = require("../controllers/auth.controller");
-
-router.post("/admin/create/event", requireSignin, adminMiddleware, createEvent);
+router.post(
+  "/admin/create/event",
+  isAuthenticatedUser,
+  authorizeRoles,
+  createEvent
+);
 router.put(
   "/admin/update/event/:id",
-  requireSignin,
-  adminMiddleware,
+  isAuthenticatedUser,
+  authorizeRoles,
   updateEvent
 );
 router.delete(
   "/admin/delete/event/:id",
-  requireSignin,
-  adminMiddleware,
+  isAuthenticatedUser,
+  authorizeRoles,
   deleteEvent
 );
 router.get("/events", getAllevents);
